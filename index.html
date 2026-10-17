@@ -2,11 +2,9 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>قیمت لحظه‌ای ارز | صرافی DARK</title>
-    <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    <!-- آیکون‌ها -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -36,82 +34,66 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 16px;
+            padding: 15px 10px; /* کاهش پدینگ برای موبایل */
             position: relative;
             overflow-x: hidden;
         }
 
-        /* افکت نور پس‌زمینه */
         body::before {
             content: '';
             position: absolute;
-            top: -150px;
-            left: -150px;
-            width: 400px;
-            height: 400px;
+            top: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
             background: rgba(59, 130, 246, 0.08);
             border-radius: 50%;
-            filter: blur(100px);
-            z-index: -1;
-        }
-        body::after {
-            content: '';
-            position: absolute;
-            bottom: -150px;
-            right: -150px;
-            width: 400px;
-            height: 400px;
-            background: rgba(34, 197, 94, 0.06);
-            border-radius: 50%;
-            filter: blur(100px);
+            filter: blur(80px);
             z-index: -1;
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.3rem; /* کوچک‌تر برای موبایل */
             font-weight: 800;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-align: center;
             background: linear-gradient(90deg, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
         }
 
         .subtitle {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
             text-align: center;
-            font-weight: 400;
         }
 
         .status-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
-            font-size: 0.85rem;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 0.75rem;
             color: var(--text-muted);
             background: rgba(255, 255, 255, 0.03);
-            padding: 6px 16px;
+            padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: var(--green);
-            box-shadow: 0 0 10px var(--green);
+            box-shadow: 0 0 8px var(--green);
             animation: pulse 2s infinite;
         }
 
         .dot.error {
             background: var(--red);
-            box-shadow: 0 0 10px var(--red);
+            box-shadow: 0 0 8px var(--red);
             animation: none;
         }
 
@@ -120,99 +102,116 @@
             50% { opacity: 0.5; transform: scale(0.9); }
         }
 
+        /* گرید بهینه برای موبایل: دو ستونه */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             width: 100%;
-            max-width: 1000px;
+            max-width: 600px;
+        }
+
+        /* در دسکتاپ ۳ یا ۴ ستونه شود */
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                max-width: 900px;
+            }
+            h1 { font-size: 1.8rem; }
+            .subtitle { font-size: 0.9rem; }
+            .card { padding: 18px; }
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 20px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            border-radius: 14px;
+            padding: 12px; /* پدینگ کمتر برای موبایل */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             border-color: var(--accent);
-            box-shadow: 0 10px 30px -10px var(--accent-glow);
+            box-shadow: 0 8px 20px -8px var(--accent-glow);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
+            align-items: flex-start;
+            margin-bottom: 8px;
         }
 
         .currency-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         .currency-icon {
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: var(--accent);
         }
 
         .currency-name {
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             font-weight: 700;
         }
 
         .currency-symbol {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
             font-family: monospace;
             background: rgba(255, 255, 255, 0.05);
-            padding: 2px 8px;
-            border-radius: 6px;
+            padding: 1px 6px;
+            border-radius: 4px;
         }
 
         .price-container {
             display: flex;
             align-items: baseline;
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 4px;
+            margin-bottom: 4px;
+            flex-wrap: wrap; /* جلوگیری از سرریز */
         }
 
         .price {
-            font-size: 1.7rem;
+            font-size: 1.1rem; /* کوچک‌تر برای موبایل */
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.3px;
             direction: ltr;
             text-align: right;
             font-variant-numeric: tabular-nums;
         }
 
         .price-unit {
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
             font-weight: 500;
         }
 
         .change {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
 
         .change.up { color: var(--green); }
@@ -220,30 +219,29 @@
         .change.neutral { color: var(--text-muted); }
 
         .footer {
-            margin-top: 40px;
-            font-size: 0.8rem;
+            margin-top: 20px;
+            font-size: 0.7rem;
             color: var(--text-muted);
             text-align: center;
             max-width: 600px;
-            line-height: 1.8;
+            line-height: 1.6;
             background: rgba(255, 255, 255, 0.02);
-            padding: 16px;
-            border-radius: 16px;
+            padding: 12px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .footer strong {
             color: var(--accent);
-            font-weight: 700;
         }
 
         .skeleton {
             background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
-            border-radius: 8px;
-            height: 24px;
-            margin-bottom: 10px;
+            border-radius: 6px;
+            height: 16px;
+            margin-bottom: 8px;
         }
 
         @keyframes shimmer {
@@ -256,14 +254,13 @@
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid var(--red);
             color: #fca5a5;
-            padding: 12px 20px;
-            border-radius: 14px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            max-width: 1000px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-bottom: 15px;
             width: 100%;
+            max-width: 600px;
             text-align: center;
-            backdrop-filter: blur(10px);
         }
 
         .error-banner.visible {
@@ -274,7 +271,7 @@
 <body>
 
     <h1>💰 قیمت لحظه‌ای ارز</h1>
-    <p class="subtitle">به واحد تومان — به‌روزرسانی خودکار هر ۱۰ ثانیه</p>
+    <p class="subtitle">به واحد تومان — به‌روزرسانی هر ۱۰ ثانیه</p>
 
     <div class="status-bar">
         <span class="dot" id="statusDot"></span>
@@ -302,24 +299,23 @@
         const REFRESH_MS = 10_000;      // هر ۱۰ ثانیه
         const RETRY_MS   = 15_000;      // در صورت خطا، ۱۵ ثانیه بعد دوباره تلاش کن
 
-        // لیست ارزهای مورد نظر
-        // key: کلید بازار در API نوبیتکس (یا priceto برای دلار)
         const CURRENCIES = [
-            { key: 'usd',  name: 'دلار آمریکا',    symbol: 'USD',  icon: 'fa-dollar-sign', source: 'priceto' },
-            { key: 'usdt', name: 'تتر',           symbol: 'USDT', icon: 'fa-t',          source: 'nobitex' },
-            { key: 'trx',  name: 'ترون',           symbol: 'TRX',  icon: 'fa-bolt',       source: 'nobitex' },
-            { key: 'btc',  name: 'بیت‌کوین',        symbol: 'BTC',  icon: 'fa-bitcoin',    source: 'nobitex' },
-            { key: 'eth',  name: 'اتریوم',          symbol: 'ETH',  icon: 'fa-ethereum',   source: 'nobitex' },
-            { key: 'ton',  name: 'تون‌کوین',        symbol: 'TON',  icon: 'fa-gem',        source: 'nobitex' },
-            { key: 'doge', name: 'دوج‌کوین',        symbol: 'DOGE', icon: 'fa-dog',        source: 'nobitex' },
+            { key: 'usd',  name: 'دلار آمریکا', symbol: 'USD',  icon: 'fa-dollar-sign', source: 'priceto' },
+            { key: 'usdt', name: 'تتر',          symbol: 'USDT', icon: 'fa-t',          source: 'nobitex' },
+            { key: 'trx',  name: 'ترون',          symbol: 'TRX',  icon: 'fa-bolt',       source: 'nobitex' },
+            { key: 'btc',  name: 'بیت‌کوین',      symbol: 'BTC',  icon: 'fa-bitcoin',    source: 'nobitex' },
+            { key: 'eth',  name: 'اتریوم',        symbol: 'ETH',  icon: 'fa-ethereum',   source: 'nobitex' },
+            { key: 'ton',  name: 'تون‌کوین',      symbol: 'TON',  icon: 'fa-gem',        source: 'nobitex' },
+            { key: 'doge', name: 'دوج‌کوین',      symbol: 'DOGE', icon: 'fa-dog',        source: 'nobitex' },
         ];
 
-        // آدرس‌های API
+        // آدرس‌های API (ریال)
         const NOBITEX_API = 'https://apiv2.nobitex.ir/market/stats?srcCurrency=usdt,trx,btc,eth,ton,doge&dstCurrency=rls';
         const PRICETO_API = 'https://api.priceto.day/v1/latest/irr/usd';
 
-        // واسط CORS برای دور زدن محدودیت مرورگر
-        const PROXY = 'https://corsproxy.io/?url=';
+        // استفاده از پروکسی پایدار برای رفع خطای CORS
+        // (allorigins.win یک سرویس رایگان و بدون نیاز به کلید است)
+        const PROXY = 'https://api.allorigins.win/raw?url=';
 
         // ============================================================
         // عناصر DOM
@@ -334,31 +330,26 @@
         // ابزارهای کمکی
         // ============================================================
 
-        /** فرمت عدد با جداکننده هزارگان */
         function formatPrice(value) {
             if (value == null || isNaN(value)) return '—';
-            // گرد کردن به نزدیک‌ترین عدد صحیح
             return Math.round(value).toLocaleString('en-US');
         }
 
-        /** ساخت کارت خالی (اسکلتون) برای نمایش اولیه */
         function buildSkeletonCards() {
             grid.innerHTML = CURRENCIES.map(c => `
                 <div class="card" data-key="${c.key}">
                     <div class="card-header">
                         <div class="currency-info">
-                            <div class="skeleton" style="width: 36px; height: 36px; border-radius: 50%;"></div>
-                            <div class="skeleton" style="width: 70px; height: 18px;"></div>
+                            <div class="skeleton" style="width: 28px; height: 28px; border-radius: 50%;"></div>
+                            <div class="skeleton" style="width: 50px; height: 14px;"></div>
                         </div>
-                        <div class="skeleton" style="width: 40px; height: 20px;"></div>
                     </div>
-                    <div class="skeleton" style="width: 120px; height: 30px; margin-bottom: 8px;"></div>
-                    <div class="skeleton" style="width: 60px; height: 16px;"></div>
+                    <div class="skeleton" style="width: 80px; height: 20px; margin-bottom: 4px;"></div>
+                    <div class="skeleton" style="width: 40px; height: 12px;"></div>
                 </div>
             `).join('');
         }
 
-        /** به‌روزرسانی DOM با داده‌های جدید */
         function renderRates(rates) {
             CURRENCIES.forEach(c => {
                 const card = grid.querySelector(`.card[data-key="${c.key}"]`);
@@ -373,7 +364,6 @@
                 const price = data.price;
                 const change = data.change;
 
-                // تعیین کلاس تغییر
                 let changeClass = 'neutral';
                 let changeText  = '—';
                 if (change != null && !isNaN(change)) {
@@ -394,7 +384,6 @@
                             <div class="currency-icon"><i class="fas ${c.icon}"></i></div>
                             <span class="currency-name">${c.name}</span>
                         </div>
-                        <span class="currency-symbol">${c.symbol}</span>
                     </div>
                     <div class="price-container">
                         <span class="price">${formatPrice(price)}</span>
@@ -407,21 +396,18 @@
             lastUpdated.textContent = new Date().toLocaleTimeString('fa-IR');
         }
 
-        /** تنظیم وضعیت "دریافت" */
         function setLoading() {
             statusDot.classList.remove('error');
             statusText.textContent = 'در حال دریافت قیمت‌ها...';
             errorBanner.classList.remove('visible');
         }
 
-        /** تنظیم وضعیت "موفق" */
         function setSuccess() {
             statusDot.classList.remove('error');
             statusText.textContent = 'قیمت‌ها به‌روز است';
             errorBanner.classList.remove('visible');
         }
 
-        /** تنظیم وضعیت "خطا" */
         function setError(message) {
             statusDot.classList.add('error');
             statusText.textContent = 'خطا در دریافت اطلاعات';
@@ -437,53 +423,66 @@
             setLoading();
 
             try {
-                // درخواست همزمان به هر دو API
-                const [nobitexRes, pricetoRes] = await Promise.all([
+                // استفاده از Promise.allSettled برای اینکه اگر یکی از APIها خطا داد، دیگری متوقف نشود
+                const results = await Promise.allSettled([
                     fetch(PROXY + encodeURIComponent(NOBITEX_API)),
                     fetch(PROXY + encodeURIComponent(PRICETO_API))
                 ]);
 
-                if (!nobitexRes.ok) throw new Error(`Nobitex HTTP ${nobitexRes.status}`);
-                if (!pricetoRes.ok) throw new Error(`PriceTo HTTP ${pricetoRes.status}`);
-
-                const nobitexData = await nobitexRes.json();
-                const pricetoData = await pricetoRes.json();
-
                 const rates = {};
+                let hasError = false;
 
-                // ۱. پردازش داده‌های نوبیتکس (ارزهای دیجیتال)
-                if (nobitexData.stats) {
-                    CURRENCIES.forEach(c => {
-                        if (c.source === 'nobitex') {
-                            const marketKey = `${c.key}-rls`;
-                            const stat = nobitexData.stats[marketKey];
-                            if (stat && stat.latest) {
-                                // قیمت نوبیتکس به ریال است، تقسیم بر ۱۰ برای تبدیل به تومان
-                                rates[c.key] = {
-                                    price: parseFloat(stat.latest) / 10,
-                                    change: stat.dayChange ? parseFloat(stat.dayChange) : null
-                                };
+                // پردازش نوبیتکس
+                if (results[0].status === 'fulfilled' && results[0].value.ok) {
+                    const nobitexData = await results[0].value.json();
+                    if (nobitexData.stats) {
+                        CURRENCIES.forEach(c => {
+                            if (c.source === 'nobitex') {
+                                const marketKey = `${c.key}-rls`;
+                                const stat = nobitexData.stats[marketKey];
+                                if (stat && stat.latest) {
+                                    // تبدیل ریال به تومان (تقسیم بر ۱۰)
+                                    rates[c.key] = {
+                                        price: parseFloat(stat.latest) / 10,
+                                        change: stat.dayChange ? parseFloat(stat.dayChange) : null
+                                    };
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                } else {
+                    hasError = true;
+                    console.error('Nobitex fetch failed');
                 }
 
-                // ۲. پردازش داده‌های PriceToDay (دلار)
-                if (pricetoData.price) {
-                    // قیمت PriceToDay به ریال است، تقسیم بر ۱۰ برای تبدیل به تومان
-                    rates['usd'] = {
-                        price: parseFloat(pricetoData.price) / 10,
-                        change: null // این API درصد تغییرات روزانه را ارائه نمی‌دهد
-                    };
+                // پردازش PriceToDay
+                if (results[1].status === 'fulfilled' && results[1].value.ok) {
+                    const pricetoData = await results[1].value.json();
+                    if (pricetoData.price) {
+                        rates['usd'] = {
+                            price: parseFloat(pricetoData.price) / 10, // تبدیل ریال به تومان
+                            change: null
+                        };
+                    }
+                } else {
+                    hasError = true;
+                    console.error('PriceTo fetch failed');
                 }
 
-                // اگر هیچ داده‌ای دریافت نشد، خطا بده
                 if (Object.keys(rates).length === 0) {
                     throw new Error('هیچ داده‌ای دریافت نشد');
                 }
 
                 renderRates(rates);
-                setSuccess();
+
+                if (hasError) {
+                    // اگر بعضی داده‌ها نیامده باشند، وضعیت را زرد/هشدار نشان بده
+                    statusDot.classList.add('error');
+                    statusText.textContent = 'برخی قیمت‌ها به‌روز نشد';
+                    errorBanner.classList.add('visible');
+                } else {
+                    setSuccess();
+                }
 
             } catch (err) {
                 console.error('[Rates] خطا:', err);
