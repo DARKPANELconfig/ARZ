@@ -16,7 +16,7 @@
             --green: #22c55e;
             --red: #ef4444;
             --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.3);
+            --accent-glow: rgba(59, 130, 246, 0.2);
             --font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
         }
 
@@ -28,32 +28,18 @@
 
         body {
             font-family: var(--font-family);
-            background: radial-gradient(circle at 20% 20%, #1e293b 0%, #0a0e17 80%);
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0a0e17 75%);
             color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px 10px; /* کاهش پدینگ برای موبایل */
-            position: relative;
+            padding: 16px 12px;
             overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            left: -100px;
-            width: 300px;
-            height: 300px;
-            background: rgba(59, 130, 246, 0.08);
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
-        }
-
         h1 {
-            font-size: 1.3rem; /* کوچک‌تر برای موبایل */
+            font-size: 1.35rem;
             font-weight: 800;
             margin-bottom: 4px;
             text-align: center;
@@ -65,21 +51,21 @@
         .subtitle {
             color: var(--text-muted);
             font-size: 0.75rem;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             text-align: center;
         }
 
         .status-bar {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 16px;
             font-size: 0.75rem;
             color: var(--text-muted);
             background: rgba(255, 255, 255, 0.03);
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .dot {
@@ -98,120 +84,120 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.9); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
-        /* گرید بهینه برای موبایل: دو ستونه */
+        /* 修复手机端卡片溢出问题：紧密两列网格 */
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             width: 100%;
-            max-width: 600px;
+            max-width: 680px;
         }
 
-        /* در دسکتاپ ۳ یا ۴ ستونه شود */
-        @media (min-width: 768px) {
+        @media (min-width: 720px) {
             .grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 15px;
-                max-width: 900px;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 14px;
+                max-width: 960px;
             }
-            h1 { font-size: 1.8rem; }
-            .subtitle { font-size: 0.9rem; }
-            .card { padding: 18px; }
+            h1 { font-size: 1.7rem; }
+            .subtitle { font-size: 0.85rem; }
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 14px;
-            padding: 12px; /* پدینگ کمتر برای موبایل */
+            padding: 12px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            min-height: 105px;
+            transition: border-color 0.2s;
+            overflow: hidden;
         }
 
         .card:hover {
-            transform: translateY(-3px);
             border-color: var(--accent);
-            box-shadow: 0 8px 20px -8px var(--accent-glow);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 4px;
         }
 
         .currency-info {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            min-width: 0;
         }
 
         .currency-icon {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: var(--accent);
+            flex-shrink: 0;
         }
 
         .currency-name {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .currency-symbol {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-muted);
             font-family: monospace;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1px 6px;
+            padding: 1px 5px;
             border-radius: 4px;
+            flex-shrink: 0;
         }
 
         .price-container {
             display: flex;
             align-items: baseline;
-            gap: 4px;
-            margin-bottom: 4px;
-            flex-wrap: wrap; /* جلوگیری از سرریز */
+            gap: 3px;
+            flex-wrap: wrap;
         }
 
         .price {
-            font-size: 1.1rem; /* کوچک‌تر برای موبایل */
+            font-size: 1.05rem;
             font-weight: 800;
-            letter-spacing: -0.3px;
             direction: ltr;
             text-align: right;
             font-variant-numeric: tabular-nums;
         }
 
         .price-unit {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-muted);
-            font-weight: 500;
         }
 
         .change {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
         }
 
         .change.up { color: var(--green); }
@@ -219,14 +205,14 @@
         .change.neutral { color: var(--text-muted); }
 
         .footer {
-            margin-top: 20px;
+            margin-top: 24px;
             font-size: 0.7rem;
             color: var(--text-muted);
             text-align: center;
-            max-width: 600px;
-            line-height: 1.6;
+            max-width: 640px;
+            line-height: 1.7;
             background: rgba(255, 255, 255, 0.02);
-            padding: 12px;
+            padding: 12px 14px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -240,8 +226,7 @@
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
             border-radius: 6px;
-            height: 16px;
-            margin-bottom: 8px;
+            height: 14px;
         }
 
         @keyframes shimmer {
@@ -254,12 +239,12 @@
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid var(--red);
             color: #fca5a5;
-            padding: 8px 12px;
+            padding: 8px 14px;
             border-radius: 10px;
             font-size: 0.75rem;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             width: 100%;
-            max-width: 600px;
+            max-width: 680px;
             text-align: center;
         }
 
@@ -279,73 +264,63 @@
     </div>
 
     <div class="error-banner" id="errorBanner">
-        ⚠️ دریافت اطلاعات با خطا مواجه شد. تلاش مجدد در ۱۵ ثانیه آینده...
+        ⚠️ ارتباط با سرور برقرار نشد. در حال تلاش با مسیر جایگزین...
     </div>
 
-    <div class="grid" id="cardsGrid">
-        <!-- کارت‌ها به صورت داینامیک ساخته می‌شوند -->
-    </div>
+    <div class="grid" id="cardsGrid"></div>
 
     <div class="footer">
-        منبع قیمت‌ها: <strong>صرافی DARK</strong> — قیمت‌ها به صورت لحظه‌ای و دقیق بر اساس بازار آزاد است.
+        منبع قیمت‌ها: <strong>صرافی DARK</strong> — قیمت‌ها به صورت دقیق و لحظه‌ای بر اساس بازار آزاد است.
         <br>
         آخرین به‌روزرسانی: <span id="lastUpdated">—</span>
     </div>
 
     <script>
-        // ============================================================
-        // تنظیمات
-        // ============================================================
-        const REFRESH_MS = 10_000;      // هر ۱۰ ثانیه
-        const RETRY_MS   = 15_000;      // در صورت خطا، ۱۵ ثانیه بعد دوباره تلاش کن
+        const REFRESH_MS = 10000;
+        const RETRY_MS = 15000;
 
         const CURRENCIES = [
-            { key: 'usd',  name: 'دلار آمریکا', symbol: 'USD',  icon: 'fa-dollar-sign', source: 'priceto' },
-            { key: 'usdt', name: 'تتر',          symbol: 'USDT', icon: 'fa-t',          source: 'nobitex' },
-            { key: 'trx',  name: 'ترون',          symbol: 'TRX',  icon: 'fa-bolt',       source: 'nobitex' },
-            { key: 'btc',  name: 'بیت‌کوین',      symbol: 'BTC',  icon: 'fa-bitcoin',    source: 'nobitex' },
-            { key: 'eth',  name: 'اتریوم',        symbol: 'ETH',  icon: 'fa-ethereum',   source: 'nobitex' },
-            { key: 'ton',  name: 'تون‌کوین',      symbol: 'TON',  icon: 'fa-gem',        source: 'nobitex' },
-            { key: 'doge', name: 'دوج‌کوین',      symbol: 'DOGE', icon: 'fa-dog',        source: 'nobitex' },
+            { key: 'usd',  name: 'دلار آمریکا', symbol: 'USD',  icon: 'fa-dollar-sign' },
+            { key: 'usdt', name: 'تتر',          symbol: 'USDT', icon: 'fa-t' },
+            { key: 'trx',  name: 'ترون',          symbol: 'TRX',  icon: 'fa-bolt' },
+            { key: 'btc',  name: 'بیت‌کوین',      symbol: 'BTC',  icon: 'fa-bitcoin' },
+            { key: 'eth',  name: 'اتریوم',        symbol: 'ETH',  icon: 'fa-ethereum' },
+            { key: 'ton',  name: 'تون‌کوین',      symbol: 'TON',  icon: 'fa-gem' },
+            { key: 'doge', name: 'دوج‌کوین',      symbol: 'DOGE', icon: 'fa-dog' }
         ];
 
-        // آدرس‌های API (ریال)
         const NOBITEX_API = 'https://apiv2.nobitex.ir/market/stats?srcCurrency=usdt,trx,btc,eth,ton,doge&dstCurrency=rls';
         const PRICETO_API = 'https://api.priceto.day/v1/latest/irr/usd';
 
-        // استفاده از پروکسی پایدار برای رفع خطای CORS
-        // (allorigins.win یک سرویس رایگان و بدون نیاز به کلید است)
-        const PROXY = 'https://api.allorigins.win/raw?url=';
+        // 代理池：自动尝试多个可靠节点
+        const PROXIES = [
+            url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+            url => `https://cors.eu.org/${url}`
+        ];
 
-        // ============================================================
-        // عناصر DOM
-        // ============================================================
-        const grid         = document.getElementById('cardsGrid');
-        const statusDot    = document.getElementById('statusDot');
-        const statusText   = document.getElementById('statusText');
-        const lastUpdated  = document.getElementById('lastUpdated');
-        const errorBanner  = document.getElementById('errorBanner');
+        const grid = document.getElementById('cardsGrid');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const lastUpdated = document.getElementById('lastUpdated');
+        const errorBanner = document.getElementById('errorBanner');
 
-        // ============================================================
-        // ابزارهای کمکی
-        // ============================================================
-
-        function formatPrice(value) {
-            if (value == null || isNaN(value)) return '—';
-            return Math.round(value).toLocaleString('en-US');
+        function formatPrice(v) {
+            if (v == null || isNaN(v)) return '—';
+            return Math.round(v).toLocaleString('en-US');
         }
 
-        function buildSkeletonCards() {
+        function buildSkeleton() {
             grid.innerHTML = CURRENCIES.map(c => `
                 <div class="card" data-key="${c.key}">
                     <div class="card-header">
                         <div class="currency-info">
-                            <div class="skeleton" style="width: 28px; height: 28px; border-radius: 50%;"></div>
-                            <div class="skeleton" style="width: 50px; height: 14px;"></div>
+                            <div class="skeleton" style="width: 24px; height: 24px; border-radius: 50%;"></div>
+                            <div class="skeleton" style="width: 40px;"></div>
                         </div>
                     </div>
-                    <div class="skeleton" style="width: 80px; height: 20px; margin-bottom: 4px;"></div>
-                    <div class="skeleton" style="width: 40px; height: 12px;"></div>
+                    <div class="skeleton" style="width: 70px; height: 18px; margin-top: 10px;"></div>
+                    <div class="skeleton" style="width: 30px; margin-top: 6px;"></div>
                 </div>
             `).join('');
         }
@@ -354,25 +329,24 @@
             CURRENCIES.forEach(c => {
                 const card = grid.querySelector(`.card[data-key="${c.key}"]`);
                 if (!card) return;
-
                 const data = rates[c.key];
                 if (!data) {
-                    card.innerHTML = `<div class="currency-name">${c.name}</div><div class="price">—</div>`;
+                    card.innerHTML = `<div class="currency-name">${c.name}</div><div class="price" style="margin-top:8px;">—</div>`;
                     return;
                 }
 
                 const price = data.price;
                 const change = data.change;
-
                 let changeClass = 'neutral';
-                let changeText  = '—';
+                let changeText = '—';
+
                 if (change != null && !isNaN(change)) {
                     if (change > 0) {
                         changeClass = 'up';
-                        changeText  = `<i class="fas fa-arrow-up"></i> ${change.toFixed(2)}٪`;
+                        changeText = `<i class="fas fa-arrow-up"></i> ${change.toFixed(2)}٪`;
                     } else if (change < 0) {
                         changeClass = 'down';
-                        changeText  = `<i class="fas fa-arrow-down"></i> ${Math.abs(change).toFixed(2)}٪`;
+                        changeText = `<i class="fas fa-arrow-down"></i> ${Math.abs(change).toFixed(2)}٪`;
                     } else {
                         changeText = '۰.۰۰٪';
                     }
@@ -389,126 +363,80 @@
                         <span class="price">${formatPrice(price)}</span>
                         <span class="price-unit">تومان</span>
                     </div>
-                    <div class="change ${changeClass}">${changeText}</div>
+                    <div class="change ${changeClass}" style="margin-top:6px;">${changeText}</div>
                 `;
             });
-
             lastUpdated.textContent = new Date().toLocaleTimeString('fa-IR');
         }
 
-        function setLoading() {
-            statusDot.classList.remove('error');
-            statusText.textContent = 'در حال دریافت قیمت‌ها...';
-            errorBanner.classList.remove('visible');
+        async function fetchThroughProxies(targetUrl) {
+            for (const makeProxy of PROXIES) {
+                try {
+                    const res = await fetch(makeProxy(targetUrl), { signal: AbortSignal.timeout(4000) });
+                    if (res.ok) return await res.json();
+                } catch (e) {
+                    // 当前节点超时或被拦截，自动尝试下一个
+                }
+            }
+            throw new Error('همه مسیرهای ارتباطی مسدود هستند');
         }
-
-        function setSuccess() {
-            statusDot.classList.remove('error');
-            statusText.textContent = 'قیمت‌ها به‌روز است';
-            errorBanner.classList.remove('visible');
-        }
-
-        function setError(message) {
-            statusDot.classList.add('error');
-            statusText.textContent = 'خطا در دریافت اطلاعات';
-            errorBanner.classList.add('visible');
-            if (message) console.error('[Rates]', message);
-        }
-
-        // ============================================================
-        // دریافت داده از APIها
-        // ============================================================
 
         async function fetchRates() {
-            setLoading();
+            statusDot.classList.remove('error');
+            statusText.textContent = 'در حال به‌روزرسانی...';
 
             try {
-                // استفاده از Promise.allSettled برای اینکه اگر یکی از APIها خطا داد، دیگری متوقف نشود
-                const results = await Promise.allSettled([
-                    fetch(PROXY + encodeURIComponent(NOBITEX_API)),
-                    fetch(PROXY + encodeURIComponent(PRICETO_API))
+                const [nobitexData, pricetoData] = await Promise.allSettled([
+                    fetchThroughProxies(NOBITEX_API),
+                    fetchThroughProxies(PRICETO_API)
                 ]);
 
                 const rates = {};
-                let hasError = false;
 
-                // پردازش نوبیتکس
-                if (results[0].status === 'fulfilled' && results[0].value.ok) {
-                    const nobitexData = await results[0].value.json();
-                    if (nobitexData.stats) {
-                        CURRENCIES.forEach(c => {
-                            if (c.source === 'nobitex') {
-                                const marketKey = `${c.key}-rls`;
-                                const stat = nobitexData.stats[marketKey];
-                                if (stat && stat.latest) {
-                                    // تبدیل ریال به تومان (تقسیم بر ۱۰)
-                                    rates[c.key] = {
-                                        price: parseFloat(stat.latest) / 10,
-                                        change: stat.dayChange ? parseFloat(stat.dayChange) : null
-                                    };
-                                }
+                if (nobitexData.status === 'fulfilled' && nobitexData.value?.stats) {
+                    const stats = nobitexData.value.stats;
+                    CURRENCIES.forEach(c => {
+                        if (c.key !== 'usd') {
+                            const stat = stats[`${c.key}-rls`];
+                            if (stat?.latest) {
+                                rates[c.key] = {
+                                    price: parseFloat(stat.latest) / 10,
+                                    change: stat.dayChange ? parseFloat(stat.dayChange) : null
+                                };
                             }
-                        });
-                    }
-                } else {
-                    hasError = true;
-                    console.error('Nobitex fetch failed');
+                        }
+                    });
                 }
 
-                // پردازش PriceToDay
-                if (results[1].status === 'fulfilled' && results[1].value.ok) {
-                    const pricetoData = await results[1].value.json();
-                    if (pricetoData.price) {
-                        rates['usd'] = {
-                            price: parseFloat(pricetoData.price) / 10, // تبدیل ریال به تومان
-                            change: null
-                        };
-                    }
-                } else {
-                    hasError = true;
-                    console.error('PriceTo fetch failed');
+                if (pricetoData.status === 'fulfilled' && pricetoData.value?.price) {
+                    rates['usd'] = {
+                        price: parseFloat(pricetoData.value.price) / 10,
+                        change: null
+                    };
                 }
 
                 if (Object.keys(rates).length === 0) {
-                    throw new Error('هیچ داده‌ای دریافت نشد');
+                    throw new Error('داده‌ای دریافت نشد');
                 }
 
                 renderRates(rates);
-
-                if (hasError) {
-                    // اگر بعضی داده‌ها نیامده باشند، وضعیت را زرد/هشدار نشان بده
-                    statusDot.classList.add('error');
-                    statusText.textContent = 'برخی قیمت‌ها به‌روز نشد';
-                    errorBanner.classList.add('visible');
-                } else {
-                    setSuccess();
-                }
+                statusText.textContent = 'قیمت‌ها به‌روز است';
+                errorBanner.classList.remove('visible');
 
             } catch (err) {
-                console.error('[Rates] خطا:', err);
-                setError(err.message);
+                statusDot.classList.add('error');
+                statusText.textContent = 'خطا در برقراری ارتباط';
+                errorBanner.classList.add('visible');
             }
         }
 
-        // ============================================================
-        // حلقه به‌روزرسانی
-        // ============================================================
-
         async function updateLoop() {
             await fetchRates();
-
-            const delay = errorBanner.classList.contains('visible')
-                ? RETRY_MS
-                : REFRESH_MS;
-
+            const delay = errorBanner.classList.contains('visible') ? RETRY_MS : REFRESH_MS;
             setTimeout(updateLoop, delay);
         }
 
-        // ============================================================
-        // شروع
-        // ============================================================
-
-        buildSkeletonCards();
+        buildSkeleton();
         updateLoop();
     </script>
 </body>
