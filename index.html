@@ -1,443 +1,299 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>قیمت لحظه‌ای ارز | صرافی DARK</title>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>صرافی DARK | قیمت لحظه‌ای ارز دیجیتال</title>
     <style>
         :root {
             --bg: #0a0e17;
-            --card-bg: rgba(30, 41, 59, 0.75);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --text: #f1f5f9;
-            --text-muted: #94a3b8;
-            --green: #22c55e;
-            --red: #ef4444;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.2);
-            --font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+            --card-bg: #131a26;
+            --text: #e6edf3;
+            --accent: #f0b90b; /* DARK gold */
+            --green: #0ecb81;
+            --red: #f6465d;
+            --border: #2a3544;
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
         body {
-            font-family: var(--font-family);
-            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0a0e17 75%);
+            background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 16px 12px;
-            overflow-x: hidden;
+            padding: 2rem 1rem;
         }
-
-        h1 {
-            font-size: 1.35rem;
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        header h1 {
+            font-size: 2.8rem;
             font-weight: 800;
-            margin-bottom: 4px;
-            text-align: center;
-            background: linear-gradient(90deg, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(240, 185, 11, 0.3);
         }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            margin-bottom: 12px;
-            text-align: center;
+        header p {
+            color: #8b9bb4;
+            margin-top: 0.5rem;
+            font-size: 1rem;
         }
-
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 16px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.03);
-            padding: 5px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green);
-            box-shadow: 0 0 8px var(--green);
-            animation: pulse 2s infinite;
-        }
-
-        .dot.error {
-            background: var(--red);
-            box-shadow: 0 0 8px var(--red);
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        /* 修复手机端卡片溢出问题：紧密两列网格 */
         .grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
             width: 100%;
-            max-width: 680px;
+            max-width: 1200px;
         }
-
-        @media (min-width: 720px) {
-            .grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 14px;
-                max-width: 960px;
-            }
-            h1 { font-size: 1.7rem; }
-            .subtitle { font-size: 0.85rem; }
-        }
-
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 14px;
-            padding: 12px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 105px;
-            transition: border-color 0.2s;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
             overflow: hidden;
         }
-
         .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             border-color: var(--accent);
         }
-
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
-            gap: 4px;
+            margin-bottom: 1rem;
         }
-
-        .currency-info {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            min-width: 0;
-        }
-
-        .currency-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            color: var(--accent);
-            flex-shrink: 0;
-        }
-
-        .currency-name {
-            font-size: 0.75rem;
+        .coin-name {
+            font-size: 1.25rem;
             font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
-
-        .currency-symbol {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            font-family: monospace;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1px 5px;
-            border-radius: 4px;
-            flex-shrink: 0;
+        .coin-symbol {
+            color: #8b9bb4;
+            font-size: 0.9rem;
+            margin-right: 0.4rem;
         }
-
-        .price-container {
-            display: flex;
-            align-items: baseline;
-            gap: 3px;
-            flex-wrap: wrap;
-        }
-
         .price {
-            font-size: 1.05rem;
+            font-size: 1.9rem;
             font-weight: 800;
             direction: ltr;
             text-align: right;
-            font-variant-numeric: tabular-nums;
+            color: #fff;
         }
-
-        .price-unit {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-        }
-
         .change {
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 8px;
+            direction: ltr;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        .change.up {
+            color: var(--green);
+            background: rgba(14, 203, 129, 0.1);
+        }
+        .change.down {
+            color: var(--red);
+            background: rgba(246, 70, 93, 0.1);
+        }
+        .status-bar {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #8b9bb4;
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-
-        .change.up { color: var(--green); }
-        .change.down { color: var(--red); }
-        .change.neutral { color: var(--text-muted); }
-
-        .footer {
-            margin-top: 24px;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-align: center;
-            max-width: 640px;
-            line-height: 1.7;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
         }
-
-        .footer strong {
-            color: var(--accent);
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
-
-        .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 6px;
-            height: 14px;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .error-banner {
-            display: none;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--red);
-            color: #fca5a5;
-            padding: 8px 14px;
+        .refresh-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1.2rem;
             border-radius: 10px;
-            font-size: 0.75rem;
-            margin-bottom: 16px;
-            width: 100%;
-            max-width: 680px;
-            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
         }
-
-        .error-banner.visible {
-            display: block;
+        .refresh-btn:hover {
+            background: var(--border);
+        }
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #5a6a80;
+            font-size: 0.85rem;
+        }
+        @media (max-width: 600px) {
+            header h1 { font-size: 2rem; }
+            .price { font-size: 1.5rem; }
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <h1>💰 قیمت لحظه‌ای ارز</h1>
-    <p class="subtitle">به واحد تومان — به‌روزرسانی هر ۱۰ ثانیه</p>
+    <header>
+        <h1>صرافی DARK</h1>
+        <p>قیمت لحظه‌ای بازارهای ارز دیجیتال</p>
+    </header>
+
+    <main class="grid" id="priceGrid">
+        <!-- کارت‌ها با جاوااسکریپت پر می‌شوند -->
+    </main>
 
     <div class="status-bar">
-        <span class="dot" id="statusDot"></span>
-        <span id="statusText">در حال دریافت قیمت‌ها...</span>
+        <span class="dot"></span>
+        <span>متصل به API</span>
+        <span>•</span>
+        <span id="lastUpdate">در حال دریافت...</span>
+        <button class="refresh-btn" onclick="fetchAllPrices()">🔄 بروزرسانی</button>
     </div>
 
-    <div class="error-banner" id="errorBanner">
-        ⚠️ ارتباط با سرور برقرار نشد. در حال تلاش با مسیر جایگزین...
-    </div>
-
-    <div class="grid" id="cardsGrid"></div>
-
-    <div class="footer">
-        منبع قیمت‌ها: <strong>صرافی DARK</strong> — قیمت‌ها به صورت دقیق و لحظه‌ای بر اساس بازار آزاد است.
-        <br>
-        آخرین به‌روزرسانی: <span id="lastUpdated">—</span>
-    </div>
+    <footer>
+        صرافی DARK © ۲۰۲۶ | داده‌ها از CoinGecko
+    </footer>
 
     <script>
-        const REFRESH_MS = 10000;
-        const RETRY_MS = 15000;
-
-        const CURRENCIES = [
-            { key: 'usd',  name: 'دلار آمریکا', symbol: 'USD',  icon: 'fa-dollar-sign' },
-            { key: 'usdt', name: 'تتر',          symbol: 'USDT', icon: 'fa-t' },
-            { key: 'trx',  name: 'ترون',          symbol: 'TRX',  icon: 'fa-bolt' },
-            { key: 'btc',  name: 'بیت‌کوین',      symbol: 'BTC',  icon: 'fa-bitcoin' },
-            { key: 'eth',  name: 'اتریوم',        symbol: 'ETH',  icon: 'fa-ethereum' },
-            { key: 'ton',  name: 'تون‌کوین',      symbol: 'TON',  icon: 'fa-gem' },
-            { key: 'doge', name: 'دوج‌کوین',      symbol: 'DOGE', icon: 'fa-dog' }
+        // ============================================================
+        // تنظیمات ارزها (برای اضافه کردن ارز جدید، فقط اینجا را ویرایش کنید)
+        // ============================================================
+        const COINS = [
+            { id: 'tether', name: 'تتر', symbol: 'USDT' },
+            { id: 'the-open-network', name: 'تون', symbol: 'TON' },
+            { id: 'tron', name: 'ترون', symbol: 'TRX' },
+            { id: 'bitcoin', name: 'بیت کوین', symbol: 'BTC' },
+            { id: 'ethereum', name: 'اتریوم', symbol: 'ETH' },
+            { id: 'usd-coin', name: 'دلار', symbol: 'USDC' } // USDC به عنوان نماینده دلار دیجیتال
         ];
 
-        const NOBITEX_API = 'https://apiv2.nobitex.ir/market/stats?srcCurrency=usdt,trx,btc,eth,ton,doge&dstCurrency=rls';
-        const PRICETO_API = 'https://api.priceto.day/v1/latest/irr/usd';
+        // ============================================================
+        // API تنظیمات
+        // ============================================================
+        const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
+        const REFRESH_INTERVAL = 60000; // هر ۶۰ ثانیه
 
-        // 代理池：自动尝试多个可靠节点
-        const PROXIES = [
-            url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-            url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-            url => `https://cors.eu.org/${url}`
-        ];
-
-        const grid = document.getElementById('cardsGrid');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        const lastUpdated = document.getElementById('lastUpdated');
-        const errorBanner = document.getElementById('errorBanner');
-
-        function formatPrice(v) {
-            if (v == null || isNaN(v)) return '—';
-            return Math.round(v).toLocaleString('en-US');
+        // ============================================================
+        // توابع کمکی
+        // ============================================================
+        function formatPrice(price) {
+            if (price >= 1000) {
+                return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else if (price >= 1) {
+                return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+            } else {
+                return price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+            }
         }
 
-        function buildSkeleton() {
-            grid.innerHTML = CURRENCIES.map(c => `
-                <div class="card" data-key="${c.key}">
-                    <div class="card-header">
-                        <div class="currency-info">
-                            <div class="skeleton" style="width: 24px; height: 24px; border-radius: 50%;"></div>
-                            <div class="skeleton" style="width: 40px;"></div>
-                        </div>
-                    </div>
-                    <div class="skeleton" style="width: 70px; height: 18px; margin-top: 10px;"></div>
-                    <div class="skeleton" style="width: 30px; margin-top: 6px;"></div>
-                </div>
-            `).join('');
+        function formatChange(change) {
+            if (change === undefined || change === null) return '—';
+            const sign = change >= 0 ? '+' : '';
+            return `${sign}${change.toFixed(2)}%`;
         }
 
-        function renderRates(rates) {
-            CURRENCIES.forEach(c => {
-                const card = grid.querySelector(`.card[data-key="${c.key}"]`);
-                if (!card) return;
-                const data = rates[c.key];
-                if (!data) {
-                    card.innerHTML = `<div class="currency-name">${c.name}</div><div class="price" style="margin-top:8px;">—</div>`;
-                    return;
-                }
+        function getChangeClass(change) {
+            if (change === undefined || change === null) return '';
+            return change >= 0 ? 'up' : 'down';
+        }
 
-                const price = data.price;
-                const change = data.change;
-                let changeClass = 'neutral';
-                let changeText = '—';
+        // ============================================================
+        // ساخت کارت‌ها در DOM
+        // ============================================================
+        function buildCards() {
+            const grid = document.getElementById('priceGrid');
+            grid.innerHTML = ''; // پاک کردن
 
-                if (change != null && !isNaN(change)) {
-                    if (change > 0) {
-                        changeClass = 'up';
-                        changeText = `<i class="fas fa-arrow-up"></i> ${change.toFixed(2)}٪`;
-                    } else if (change < 0) {
-                        changeClass = 'down';
-                        changeText = `<i class="fas fa-arrow-down"></i> ${Math.abs(change).toFixed(2)}٪`;
-                    } else {
-                        changeText = '۰.۰۰٪';
-                    }
-                }
-
+            COINS.forEach(coin => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card-${coin.id}`;
                 card.innerHTML = `
                     <div class="card-header">
-                        <div class="currency-info">
-                            <div class="currency-icon"><i class="fas ${c.icon}"></i></div>
-                            <span class="currency-name">${c.name}</span>
+                        <div>
+                            <span class="coin-name">${coin.name}</span>
+                            <span class="coin-symbol">${coin.symbol}</span>
                         </div>
                     </div>
-                    <div class="price-container">
-                        <span class="price">${formatPrice(price)}</span>
-                        <span class="price-unit">تومان</span>
-                    </div>
-                    <div class="change ${changeClass}" style="margin-top:6px;">${changeText}</div>
+                    <div class="price" id="price-${coin.id}">—</div>
+                    <div class="change" id="change-${coin.id}">—</div>
                 `;
+                grid.appendChild(card);
             });
-            lastUpdated.textContent = new Date().toLocaleTimeString('fa-IR');
         }
 
-        async function fetchThroughProxies(targetUrl) {
-            for (const makeProxy of PROXIES) {
-                try {
-                    const res = await fetch(makeProxy(targetUrl), { signal: AbortSignal.timeout(4000) });
-                    if (res.ok) return await res.json();
-                } catch (e) {
-                    // 当前节点超时或被拦截，自动尝试下一个
-                }
-            }
-            throw new Error('همه مسیرهای ارتباطی مسدود هستند');
-        }
-
-        async function fetchRates() {
-            statusDot.classList.remove('error');
-            statusText.textContent = 'در حال به‌روزرسانی...';
-
+        // ============================================================
+        // دریافت قیمت‌ها از API
+        // ============================================================
+        async function fetchAllPrices() {
             try {
-                const [nobitexData, pricetoData] = await Promise.allSettled([
-                    fetchThroughProxies(NOBITEX_API),
-                    fetchThroughProxies(PRICETO_API)
-                ]);
+                const ids = COINS.map(c => c.id).join(',');
+                const response = await fetch(
+                    `${API_URL}?ids=${ids}&vs_currencies=usd&include_24hr_change=true`
+                );
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
 
-                const rates = {};
+                // به‌روزرسانی DOM
+                COINS.forEach(coin => {
+                    const priceEl = document.getElementById(`price-${coin.id}`);
+                    const changeEl = document.getElementById(`change-${coin.id}`);
+                    const coinData = data[coin.id];
 
-                if (nobitexData.status === 'fulfilled' && nobitexData.value?.stats) {
-                    const stats = nobitexData.value.stats;
-                    CURRENCIES.forEach(c => {
-                        if (c.key !== 'usd') {
-                            const stat = stats[`${c.key}-rls`];
-                            if (stat?.latest) {
-                                rates[c.key] = {
-                                    price: parseFloat(stat.latest) / 10,
-                                    change: stat.dayChange ? parseFloat(stat.dayChange) : null
-                                };
-                            }
-                        }
-                    });
-                }
+                    if (coinData && coinData.usd !== undefined) {
+                        priceEl.textContent = '$' + formatPrice(coinData.usd);
+                        const change = coinData.usd_24h_change;
+                        changeEl.textContent = formatChange(change);
+                        changeEl.className = 'change ' + getChangeClass(change);
+                    } else {
+                        priceEl.textContent = 'N/A';
+                        changeEl.textContent = '—';
+                        changeEl.className = 'change';
+                    }
+                });
 
-                if (pricetoData.status === 'fulfilled' && pricetoData.value?.price) {
-                    rates['usd'] = {
-                        price: parseFloat(pricetoData.value.price) / 10,
-                        change: null
-                    };
-                }
+                // به‌روزرسانی وضعیت
+                const now = new Date().toLocaleTimeString('fa-IR');
+                document.getElementById('lastUpdate').textContent = `آخرین بروزرسانی: ${now}`;
 
-                if (Object.keys(rates).length === 0) {
-                    throw new Error('داده‌ای دریافت نشد');
-                }
-
-                renderRates(rates);
-                statusText.textContent = 'قیمت‌ها به‌روز است';
-                errorBanner.classList.remove('visible');
-
-            } catch (err) {
-                statusDot.classList.add('error');
-                statusText.textContent = 'خطا در برقراری ارتباط';
-                errorBanner.classList.add('visible');
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+                document.getElementById('lastUpdate').textContent = 'خطا در دریافت داده — دوباره تلاش کنید';
             }
         }
 
-        async function updateLoop() {
-            await fetchRates();
-            const delay = errorBanner.classList.contains('visible') ? RETRY_MS : REFRESH_MS;
-            setTimeout(updateLoop, delay);
-        }
+        // ============================================================
+        // شروع
+        // ============================================================
+        buildCards();
+        fetchAllPrices();
 
-        buildSkeleton();
-        updateLoop();
+        // بروزرسانی خودکار
+        setInterval(fetchAllPrices, REFRESH_INTERVAL);
     </script>
+
 </body>
 </html>
