@@ -209,7 +209,7 @@
     </div>
 
     <div class="footer">
-        منبع داده‌ها: <a href="https://nerkh.jahankhahan.shop" target="_blank" rel="noopener">Nerkhsanj</a> —
+        منبع داده‌ها: <a href="https://priceto.day" target="_blank" rel="noopener">PriceToDay</a> —
         قیمت‌ها به صورت تقریبی و بر اساس بازار آزاد است. این اطلاعات توصیه مالی نیست.
         <br>
         آخرین به‌روزرسانی: <span id="lastUpdated">—</span>
@@ -219,19 +219,19 @@
         // ============================================================
         // تنظیمات
         // ============================================================
-        const API_URL = 'https://nerkh.jahankhahan.shop/data/live.json';
+        // آدرس اصلی API
+        const RAW_API_URL = 'https://api.priceto.day/v1/latest/irr/usd';
+        
+        // استفاده از سرویس واسط (CORS Proxy) برای دور زدن محدودیت مرورگر
+        // این سرویس برای دامنه‌های github.io کاملاً رایگان و پایدار است
+        const PROXY_URL = 'https://corsproxy.io/?url=' + encodeURIComponent(RAW_API_URL);
+
         const REFRESH_MS = 60_000;      // هر ۶۰ ثانیه
         const RETRY_MS   = 30_000;      // در صورت خطا، ۳۰ ثانیه بعد دوباره تلاش کن
 
-        // ارزهایی که می‌خواهیم نمایش دهیم
+        // ارزهای مورد نظر (این API فعلاً فقط دلار را برمی‌گرداند)
         const CURRENCIES = [
-            { key: 'dollar',  name: 'دلار آمریکا',       symbol: 'USD'  },
-            { key: 'tether',  name: 'تتر',                symbol: 'USDT' },
-            { key: 'euro',    name: 'یورو',               symbol: 'EUR'  },
-            { key: 'pound',   name: 'پوند انگلیس',        symbol: 'GBP'  },
-            { key: 'aed',     name: 'درهم امارات',        symbol: 'AED'  },
-            { key: 'try',     name: 'لیر ترکیه',          symbol: 'TRY'  },
-            { key: 'cny',     name: 'یوان چین',           symbol: 'CNY'  },
+            { key: 'usd', name: 'دلار آمریکا', symbol: 'USD' },
         ];
 
         // ============================================================
@@ -247,13 +247,11 @@
         // ابزارهای کمکی
         // ============================================================
 
-        /** فرمت عدد با جداکننده هزارگان */
         function formatPrice(value) {
             if (value == null || isNaN(value)) return '—';
             return Number(value).toLocaleString('en-US');
         }
 
-        /** ساخت کارت خالی (اسکلتون) برای نمایش اولیه */
         function buildSkeletonCards() {
             grid.innerHTML = CURRENCIES.map(c => `
                 <div class="card" data-key="${c.key}">
@@ -267,32 +265,12 @@
             `).join('');
         }
 
-        /** به‌روزرسانی DOM با داده‌های جدید */
         function renderRates(data) {
-            const rates  = data.rates || {};
-            const change = data.change || {};
-
+            const price = data.price;
+            
             CURRENCIES.forEach(c => {
                 const card = grid.querySelector(`.card[data-key="${c.key}"]`);
                 if (!card) return;
-
-                const price = rates[c.key];
-                const pct   = change[c.key];
-
-                // تعیین کلاس تغییر
-                let changeClass = 'neutral';
-                let changeText  = '—';
-                if (pct != null && !isNaN(pct)) {
-                    if (pct > 0) {
-                        changeClass = 'up';
-                        changeText  = `▲ ${pct.toFixed(2)}٪`;
-                    } else if (pct < 0) {
-                        changeClass = 'down';
-                        changeText  = `▼ ${Math.abs(pct).toFixed(2)}٪`;
-                    } else {
-                        changeText = '۰.۰۰٪';
-                    }
-                }
 
                 card.innerHTML = `
                     <div class="card-header">
@@ -303,33 +281,25 @@
                         ${formatPrice(price)}
                         <span class="price-unit">تومان</span>
                     </div>
-                    <div class="change ${changeClass}">${changeText}</div>
+                    <div class="change neutral">—</div>
                 `;
             });
 
-            // نمایش زمان به‌روزرسانی
-            if (data.time) {
-                lastUpdated.textContent = `ساعت ${data.time} — تاریخ ${data.date || ''}`;
-            } else {
-                lastUpdated.textContent = new Date().toLocaleTimeString('fa-IR');
-            }
+            lastUpdated.textContent = new Date().toLocaleTimeString('fa-IR');
         }
 
-        /** تنظیم وضعیت "دریافت" */
         function setLoading() {
             statusDot.classList.remove('error');
             statusText.textContent = 'در حال دریافت قیمت‌ها...';
             errorBanner.classList.remove('visible');
         }
 
-        /** تنظیم وضعیت "موفق" */
         function setSuccess() {
             statusDot.classList.remove('error');
             statusText.textContent = 'قیمت‌ها به‌روز است';
             errorBanner.classList.remove('visible');
         }
 
-        /** تنظیم وضعیت "خطا" */
         function setError(message) {
             statusDot.classList.add('error');
             statusText.textContent = 'خطا در دریافت اطلاعات';
@@ -338,45 +308,34 @@
         }
 
         // ============================================================
-        // دریافت داده از API
+        // دریافت داده از API (از طریق Proxy)
         // ============================================================
-
         async function fetchRates() {
             setLoading();
-
             try {
-                const res = await fetch(API_URL, { cache: 'no-store' });
-
+                // درخواست از طریق آدرس Proxy ارسال می‌شود
+                const res = await fetch(PROXY_URL);
+                
                 if (!res.ok) {
                     throw new Error(`HTTP ${res.status}`);
                 }
-
+                
                 const data = await res.json();
-
-                // اگر داده معتبر نبود، خطا بده
-                if (!data || !data.rates) {
-                    throw new Error('ساختار داده نامعتبر است');
-                }
-
                 renderRates(data);
                 setSuccess();
 
             } catch (err) {
                 console.error('[Rates] خطا:', err);
                 setError(err.message);
-                // اگر قبلاً داده‌ای نمایش داده شده، آن را نگه دار
-                // اگر هیچ داده‌ای نداریم، اسکلتون را حفظ کن
             }
         }
 
         // ============================================================
         // حلقه به‌روزرسانی
         // ============================================================
-
         async function updateLoop() {
             await fetchRates();
 
-            // اگر خطا داشتیم، سریع‌تر دوباره تلاش کن
             const delay = errorBanner.classList.contains('visible')
                 ? RETRY_MS
                 : REFRESH_MS;
@@ -387,7 +346,6 @@
         // ============================================================
         // شروع
         // ============================================================
-
         buildSkeletonCards();
         updateLoop();
     </script>
