@@ -1,356 +1,643 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>صرافی DARK | قیمت لحظه‌ای ارز دیجیتال</title>
-    <style>
-        :root {
-            --bg-gradient: radial-gradient(circle at top right, #1a2333, #0a0e17);
-            --card-bg: rgba(19, 26, 38, 0.7);
-            --text-main: #f0f4f8;
-            --text-muted: #8b9bb4;
-            --accent: #f0b90b;
-            --green: #0ecb81;
-            --red: #f6465d;
-            --border: rgba(255, 255, 255, 0.08);
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem 1rem;
-            background-attachment: fixed;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        header h1 {
-            font-size: 3rem;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: var(--accent);
-            text-shadow: 0 0 30px rgba(240, 185, 11, 0.4);
-        }
-        header p {
-            color: var(--text-muted);
-            margin-top: 0.8rem;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
-            max-width: 1400px;
-        }
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.8rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        .card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(240, 185, 11, 0.5);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(240, 185, 11, 0.1);
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-        }
-        .coin-title {
-            display: flex;
-            flex-direction: column;
-        }
-        .coin-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-        .coin-symbol {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-top: 0.2rem;
-            letter-spacing: 0.5px;
-        }
-        .price-section {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        .price-usd {
-            font-size: 1.8rem;
-            font-weight: 800;
-            direction: ltr;
-            color: #fff;
-            letter-spacing: 0.5px;
-        }
-        .change-badge {
-            font-size: 0.9rem;
-            font-weight: 700;
-            padding: 0.3rem 0.7rem;
-            border-radius: 8px;
-            direction: ltr;
-            margin-top: 0.5rem;
-            display: inline-block;
-        }
-        .change-badge.up {
-            color: var(--green);
-            background: rgba(14, 203, 129, 0.15);
-        }
-        .change-badge.down {
-            color: var(--red);
-            background: rgba(246, 70, 93, 0.15);
-        }
-        .toman-section {
-            margin-top: 1.2rem;
-            padding-top: 1rem;
-            border-top: 1px dashed var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .toman-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-        .price-toman {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--accent);
-            direction: rtl;
-            text-shadow: 0 0 15px rgba(240, 185, 11, 0.2);
-        }
-        .status-bar {
-            margin-top: 3rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            background: var(--card-bg);
-            backdrop-filter: blur(8px);
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-        }
-        .dot {
-            width: 10px;
-            height: 10px;
-            background: var(--green);
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 1.5s infinite;
-            box-shadow: 0 0 10px var(--green);
-        }
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .refresh-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 0.4rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .refresh-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        footer {
-            margin-top: 4rem;
-            text-align: center;
-            color: #4a5a70;
-            font-size: 0.85rem;
-        }
-        @media (max-width: 600px) {
-            header h1 { font-size: 2.2rem; }
-            .grid { grid-template-columns: 1fr; }
-            .price-usd { font-size: 1.5rem; }
-            .price-toman { font-size: 1.2rem; }
-            .card { padding: 1.4rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b14">
+<title>صرافی DARK | قیمت لحظه‌ای ارز دیجیتال</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Tahoma, Arial, sans-serif;
+    background: #080b14;
+    color: #f1f5f9;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 55px;
+    height: 55px;
+    border-radius: 17px;
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #9333ea, #0284c7);
+    box-shadow: 0 0 25px #7c3aed55;
+}
+
+.brand h1 {
+    font-size: 25px;
+    letter-spacing: 1px;
+}
+
+.brand p {
+    color: #94a3b8;
+    font-size: 12px;
+    margin-top: 7px;
+}
+
+.status {
+    padding: 12px 15px;
+    border: 1px solid #263449;
+    background: #111827;
+    border-radius: 12px;
+    color: #22c55e;
+    font-size: 12px;
+}
+
+.hero {
+    padding: 25px;
+    border-radius: 22px;
+    border: 1px solid #44316d;
+    background: linear-gradient(120deg, #20113d, #111827, #092437);
+    margin-bottom: 22px;
+}
+
+.hero h2 {
+    font-size: 29px;
+    margin-bottom: 13px;
+}
+
+.hero p {
+    color: #b6c2d6;
+    line-height: 2;
+    font-size: 13px;
+}
+
+.rate-box {
+    margin-top: 22px;
+    padding: 16px;
+    border-radius: 14px;
+    background: #090e1b;
+    border: 1px solid #303650;
+}
+
+.rate-box label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.rate-controls {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    background: #111827;
+    border: 1px solid #334155;
+    color: white;
+    border-radius: 10px;
+    padding: 12px;
+    outline: none;
+    min-width: 0;
+}
+
+#usdRate {
+    width: 100%;
+}
+
+button {
+    background: linear-gradient(135deg, #9333ea, #2563eb);
+    border: none;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+.hint {
+    color: #94a3b8;
+    font-size: 11px;
+    margin-top: 10px;
+    line-height: 1.9;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.stat {
+    background: #111827;
+    border: 1px solid #263449;
+    padding: 17px;
+    border-radius: 15px;
+}
+
+.stat span {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.stat strong {
+    font-size: 17px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 25px 0 15px;
+}
+
+.toolbar h3 {
+    font-size: 18px;
+}
+
+#search {
+    width: 240px;
+}
+
+.table-box {
+    background: #0d1422;
+    border: 1px solid #263449;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #172033;
+    color: #a5b4cc;
+}
+
+th, td {
+    padding: 16px 13px;
+    text-align: right;
+    border-bottom: 1px solid #202b3d;
+    font-size: 13px;
+}
+
+tbody tr:hover {
+    background: #151f33;
+}
+
+.coin {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.coin img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.coin-name {
+    font-weight: bold;
+}
+
+.coin-symbol {
+    color: #94a3b8;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.price {
+    direction: ltr;
+    text-align: right;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.up {
+    color: #22c55e;
+}
+
+.down {
+    color: #fb7185;
+}
+
+.loading {
+    text-align: center;
+    padding: 35px;
+    color: #94a3b8;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 15px;
+    color: #8492aa;
+    font-size: 11px;
+    line-height: 2;
+}
+
+@media (max-width: 650px) {
+    .container {
+        padding: 12px;
+    }
+
+    .hero h2 {
+        font-size: 23px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar {
+        align-items: stretch;
+    }
+
+    #search {
+        width: 100%;
+    }
+
+    .toolbar button {
+        width: 100%;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <header>
-        <h1>صرافی DARK</h1>
-        <p>قیمت لحظه‌ای بازارهای ارز دیجیتال (دلار و تومان)</p>
-    </header>
+<div class="container">
 
-    <main class="grid" id="priceGrid"></main>
-
-    <div class="status-bar">
-        <span class="dot"></span>
-        <span>متصل به API</span>
-        <span>•</span>
-        <span id="lastUpdate">در حال دریافت...</span>
-        <button class="refresh-btn" onclick="fetchAllPrices()">🔄 بروزرسانی</button>
+<header>
+    <div class="brand">
+        <div class="logo">D</div>
+        <div>
+            <h1>صرافی DARK</h1>
+            <p>بازار آنلاین ارزهای دیجیتال</p>
+        </div>
     </div>
 
-    <footer>صرافی DARK © ۲۰۲۶ | داده‌ها از CoinGecko و Nobitex</footer>
+    <div class="status" id="status">
+        ● در حال دریافت قیمت‌ها
+    </div>
+</header>
 
-    <script>
-        const COINS = [
-            { id: 'tether',            name: 'تتر',          symbol: 'USDT', nobitex: 'usdt' },
-            { id: 'the-open-network',  name: 'تون',          symbol: 'TON',  nobitex: 'ton'  },
-            { id: 'tron',              name: 'ترون',         symbol: 'TRX',  nobitex: 'trx'  },
-            { id: 'bitcoin',           name: 'بیت کوین',     symbol: 'BTC',  nobitex: 'btc'  },
-            { id: 'ethereum',          name: 'اتریوم',       symbol: 'ETH',  nobitex: 'eth'  },
-            { id: 'solana',            name: 'سولانا',       symbol: 'SOL',  nobitex: 'sol'  },
-            { id: 'ripple',            name: 'ریپل',         symbol: 'XRP',  nobitex: 'xrp'  },
-            { id: 'dogecoin',          name: 'دوج کوین',     symbol: 'DOGE', nobitex: 'doge' },
-            { id: 'cardano',           name: 'کاردانو',      symbol: 'ADA',  nobitex: 'ada'  },
-            { id: 'binancecoin',       name: 'بایننس کوین',  symbol: 'BNB',  nobitex: 'bnb'  },
-            { id: 'avalanche-2',       name: 'آوالانچ',      symbol: 'AVAX', nobitex: 'avax' },
-            { id: 'chainlink',         name: 'چین لینک',     symbol: 'LINK', nobitex: 'link' },
-            { id: 'polkadot',          name: 'پولکادات',     symbol: 'DOT',  nobitex: 'dot'  },
-            { id: 'shiba-inu',         name: 'شیبا اینو',    symbol: 'SHIB', nobitex: 'shib' },
-            { id: 'litecoin',          name: 'لایت کوین',    symbol: 'LTC',  nobitex: 'ltc'  },
-        ];
+<section class="hero">
+    <h2>دنیای کریپتو در صرافی DARK</h2>
 
-        const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price';
-        const NOBITEX_URL = 'https://apiv2.nobitex.ir/market/stats';
-        const REFRESH_INTERVAL = 60000;
+    <p>
+        قیمت ارزهای دیجیتال را به‌صورت دلاری و تومانی مشاهده کن.
+        اطلاعات قیمت از سرویس‌های آنلاین دریافت می‌شوند.
+    </p>
 
-        function formatUSD(price) {
-            if (price >= 1000) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            if (price >= 1) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
-            return price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
-        }
+    <div class="rate-box">
+        <label for="usdRate">نرخ هر دلار به تومان</label>
 
-        function formatChange(change) {
-            if (change === undefined || change === null) return '—';
-            const sign = change >= 0 ? '+' : '';
-            return `${sign}${change.toFixed(2)}%`;
-        }
+        <div class="rate-controls">
+            <input
+                type="number"
+                id="usdRate"
+                value="100000"
+                min="1"
+                step="100"
+            >
 
-        function getChangeClass(change) {
-            if (change === undefined || change === null) return '';
-            return change >= 0 ? 'up' : 'down';
-        }
+            <button onclick="saveRate()">ثبت نرخ</button>
+        </div>
 
-        function buildCards() {
-            const grid = document.getElementById('priceGrid');
-            grid.innerHTML = '';
-            COINS.forEach(coin => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.id = `card-${coin.id}`;
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div class="coin-title">
-                            <span class="coin-name">${coin.name}</span>
-                            <span class="coin-symbol">${coin.symbol}</span>
+        <div class="hint">
+            برای محاسبه قیمت تومانی، نرخ دلار بازار موردنظرت را وارد کن.
+            نرخ پیش‌فرض صرفاً نمونه است و باید بررسی یا اصلاح شود.
+        </div>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="stat">
+        <span>تعداد ارزها</span>
+        <strong id="coinCount">۲۵ ارز</strong>
+    </div>
+
+    <div class="stat">
+        <span>نرخ دلار</span>
+        <strong id="rateDisplay">۱۰۰٬۰۰۰ تومان</strong>
+    </div>
+
+    <div class="stat">
+        <span>آخرین بروزرسانی</span>
+        <strong id="updatedAt">در انتظار اطلاعات</strong>
+    </div>
+</section>
+
+<div class="toolbar">
+    <h3>قیمت لحظه‌ای ارزها</h3>
+
+    <input
+        type="search"
+        id="search"
+        placeholder="جستجوی نام یا نماد ارز..."
+        oninput="renderCoins()"
+    >
+
+    <button onclick="loadPrices()">↻ بروزرسانی</button>
+</div>
+
+<div class="table-box">
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ارز دیجیتال</th>
+                    <th>قیمت دلاری</th>
+                    <th>قیمت تومانی</th>
+                    <th>تغییر ۲۴ ساعته</th>
+                </tr>
+            </thead>
+
+            <tbody id="coinTable">
+                <tr>
+                    <td colspan="5" class="loading">
+                        در حال دریافت قیمت ارزها...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer>
+    <strong>صرافی DARK</strong><br>
+    اطلاعات قیمت از CoinGecko دریافت می‌شود.
+    قیمت تومانی از ضرب قیمت دلاری در نرخ دلار واردشده محاسبه می‌شود.
+    قیمت‌ها ممکن است با تأخیر همراه باشند و تضمین‌کننده قیمت معامله در صرافی‌ها نیستند.
+</footer>
+
+</div>
+
+<script>
+const coins = [
+    {id:"tether", name:"تتر", symbol:"USDT"},
+    {id:"the-open-network", name:"تون‌کوین", symbol:"TON"},
+    {id:"tron", name:"ترون", symbol:"TRX"},
+    {id:"bitcoin", name:"بیت‌کوین", symbol:"BTC"},
+    {id:"ethereum", name:"اتریوم", symbol:"ETH"},
+    {id:"binancecoin", name:"بایننس کوین", symbol:"BNB"},
+    {id:"solana", name:"سولانا", symbol:"SOL"},
+    {id:"ripple", name:"ریپل", symbol:"XRP"},
+    {id:"dogecoin", name:"دوج‌کوین", symbol:"DOGE"},
+    {id:"cardano", name:"کاردانو", symbol:"ADA"},
+    {id:"avalanche-2", name:"آوالانچ", symbol:"AVAX"},
+    {id:"polkadot", name:"پولکادات", symbol:"DOT"},
+    {id:"chainlink", name:"چین‌لینک", symbol:"LINK"},
+    {id:"shiba-inu", name:"شیبا اینو", symbol:"SHIB"},
+    {id:"litecoin", name:"لایت‌کوین", symbol:"LTC"},
+    {id:"bitcoin-cash", name:"بیت‌کوین کش", symbol:"BCH"},
+    {id:"stellar", name:"استلار", symbol:"XLM"},
+    {id:"uniswap", name:"یونی‌سواپ", symbol:"UNI"},
+    {id:"ethereum-classic", name:"اتریوم کلاسیک", symbol:"ETC"},
+    {id:"near", name:"نیر", symbol:"NEAR"},
+    {id:"aptos", name:"آپتوس", symbol:"APT"},
+    {id:"sui", name:"سویی", symbol:"SUI"},
+    {id:"cosmos", name:"کازماس", symbol:"ATOM"},
+    {id:"internet-computer", name:"اینترنت کامپیوتر", symbol:"ICP"},
+    {id:"pol", name:"پالیگان", symbol:"POL"}
+];
+
+let prices = {};
+let manualRate = false;
+
+const numberFormat = new Intl.NumberFormat("fa-IR", {
+    maximumFractionDigits: 0
+});
+
+function formatNumber(value) {
+    return numberFormat.format(value);
+}
+
+function formatUSD(value) {
+    return "$" + Number(value).toLocaleString("en-US", {
+        maximumFractionDigits: value >= 100 ? 2 :
+                               value >= 1 ? 4 : 8
+    });
+}
+
+function formatToman(value) {
+    return formatNumber(Math.round(value)) + " تومان";
+}
+
+function getRate() {
+    return Math.max(
+        1,
+        Number(document.getElementById("usdRate").value) || 100000
+    );
+}
+
+function saveRate() {
+    manualRate = true;
+    renderCoins();
+}
+
+function renderCoins() {
+    const query = document.getElementById("search")
+        .value.trim().toLowerCase();
+
+    const rate = getRate();
+
+    document.getElementById("rateDisplay").textContent =
+        formatToman(rate);
+
+    const filtered = coins.filter(coin =>
+        (coin.name + " " + coin.symbol)
+        .toLowerCase()
+        .includes(query)
+    );
+
+    document.getElementById("coinCount").textContent =
+        formatNumber(filtered.length) + " ارز";
+
+    const table = document.getElementById("coinTable");
+
+    table.innerHTML = filtered.map((coin, index) => {
+        const data = prices[coin.id];
+
+        if (!data || typeof data.usd !== "number") {
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="coin">
+                            <div>
+                                <div class="coin-name">${coin.name}</div>
+                                <div class="coin-symbol">${coin.symbol}</div>
+                            </div>
                         </div>
-                        <div class="price-section">
-                            <div class="price-usd" id="price-usd-${coin.id}">—</div>
-                            <div class="change-badge" id="change-usd-${coin.id}">—</div>
+                    </td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                </tr>
+            `;
+        }
+
+        const change = Number(data.usd_24h_change || 0);
+        const changeClass = change >= 0 ? "up" : "down";
+        const sign = change >= 0 ? "+" : "";
+
+        return `
+            <tr>
+                <td>${index + 1}</td>
+
+                <td>
+                    <div class="coin">
+                        <img
+                            src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+                            alt=""
+                            style="display:none"
+                        >
+                        <div>
+                            <div class="coin-name">${coin.name}</div>
+                            <div class="coin-symbol">${coin.symbol}</div>
                         </div>
                     </div>
-                    <div class="toman-section">
-                        <span class="toman-label">قیمت تومانی</span>
-                        <span class="price-toman" id="price-toman-${coin.id}">— تومان</span>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                </td>
+
+                <td class="price">${formatUSD(data.usd)}</td>
+
+                <td class="price">${formatToman(data.usd * rate)}</td>
+
+                <td>
+                    <span class="${changeClass}">
+                        ${sign}${change.toFixed(2)}%
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+async function loadPrices() {
+    const status = document.getElementById("status");
+
+    status.textContent = "● در حال دریافت قیمت‌ها";
+
+    try {
+        const ids = coins.map(coin => coin.id).join(",");
+
+        const url =
+            "https://api.coingecko.com/api/v3/simple/price" +
+            "?ids=" + encodeURIComponent(ids) +
+            "&vs_currencies=usd&include_24hr_change=true";
+
+        const response = await fetch(url, {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("API error: " + response.status);
         }
 
-        async function fetchUSDTPrices() {
+        prices = await response.json();
+
+        // نرخ خودکار مرجع دلار به ریال؛ تبدیل به تومان
+        if (!manualRate) {
             try {
-                const ids = COINS.map(c => c.id).join(',');
-                const res = await fetch(`${COINGECKO_URL}?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
-                if (!res.ok) throw new Error('CoinGecko error');
-                const data = await res.json();
-                COINS.forEach(coin => {
-                    const priceEl = document.getElementById(`price-usd-${coin.id}`);
-                    const changeEl = document.getElementById(`change-usd-${coin.id}`);
-                    const d = data[coin.id];
-                    if (d && d.usd !== undefined) {
-                        priceEl.textContent = '$' + formatUSD(d.usd);
-                        const ch = d.usd_24h_change;
-                        changeEl.textContent = formatChange(ch);
-                        changeEl.className = 'change-badge ' + getChangeClass(ch);
-                    } else {
-                        priceEl.textContent = 'N/A';
-                        changeEl.textContent = '—';
-                        changeEl.className = 'change-badge';
+                const fxResponse = await fetch(
+                    "https://open.er-api.com/v6/latest/USD",
+                    {cache: "no-store"}
+                );
+
+                if (fxResponse.ok) {
+                    const fx = await fxResponse.json();
+
+                    if (
+                        fx.result === "success" &&
+                        fx.rates &&
+                        fx.rates.IRR
+                    ) {
+                        const tomanRate = fx.rates.IRR / 10;
+
+                        if (tomanRate > 1000 && tomanRate < 10000000) {
+                            document.getElementById("usdRate").value =
+                                Math.round(tomanRate);
+                        }
                     }
-                });
-            } catch (e) {
-                console.error('خطا در دریافت قیمت دلاری:', e);
+                }
+            } catch (error) {
+                console.log("FX rate unavailable.");
             }
         }
 
-        async function fetchTomanPrices() {
-            try {
-                const srcList = COINS.map(c => c.nobitex).join(',');
-                const res = await fetch(`${NOBITEX_URL}?srcCurrency=${srcList}&dstCurrency=rls`);
-                if (!res.ok) throw new Error('Nobitex error');
-                const data = await res.json();
-                if (data.status !== 'ok' || !data.stats) return;
+        renderCoins();
 
-                COINS.forEach(coin => {
-                    const el = document.getElementById(`price-toman-${coin.id}`);
-                    // نکته مهم: کلیدهای نوبیتکس با خط تیره هستند (مثلاً usdt-rls)
-                    const marketKey = `${coin.nobitex}-rls`;
-                    const marketData = data.stats[marketKey];
+        document.getElementById("updatedAt").textContent =
+            new Date().toLocaleTimeString("fa-IR");
 
-                    if (marketData && marketData.latest) {
-                        const toman = parseFloat(marketData.latest) / 10;
-                        el.textContent = toman.toLocaleString('fa-IR', { maximumFractionDigits: 0 }) + ' تومان';
-                    } else {
-                        el.textContent = '— تومان';
-                    }
-                });
-            } catch (e) {
-                console.error('خطا در دریافت قیمت تومانی:', e);
-            }
-        }
+        status.textContent = "● قیمت‌ها دریافت شدند";
 
-        async function fetchAllPrices() {
-            await Promise.all([fetchUSDTPrices(), fetchTomanPrices()]);
-            const now = new Date().toLocaleTimeString('fa-IR');
-            document.getElementById('lastUpdate').textContent = `آخرین بروزرسانی: ${now}`;
-        }
+    } catch (error) {
+        console.error(error);
 
-        buildCards();
-        fetchAllPrices();
-        setInterval(fetchAllPrices, REFRESH_INTERVAL);
-    </script>
+        status.textContent = "● خطا در دریافت اطلاعات";
+
+        document.getElementById("coinTable").innerHTML = `
+            <tr>
+                <td colspan="5" class="loading">
+                    دریافت قیمت‌ها ناموفق بود.
+                    اتصال اینترنت و محدودیت API را بررسی کن
+                    و دوباره تلاش کن.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+document.getElementById("usdRate").addEventListener("change", () => {
+    manualRate = true;
+    renderCoins();
+});
+
+loadPrices();
+
+// تلاش برای بروزرسانی هر ۶۰ ثانیه
+setInterval(loadPrices, 60000);
+</script>
 
 </body>
-</html>
+    </html>
