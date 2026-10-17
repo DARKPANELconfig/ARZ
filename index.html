@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قیمت لحظه‌ای ارز به تومان</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --green: #22c55e;
+            --red: #ef4444;
+            --border: #334155;
+            --accent: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 4px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        .dot.error {
+            background: var(--red);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            width: 100%;
+            max-width: 960px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 18px;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .currency-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .currency-symbol {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .price {
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .price-unit {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        .change {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .change.up { color: var(--green); }
+        .change.down { color: var(--red); }
+        .change.neutral { color: var(--text-muted); }
+
+        .footer {
+            margin-top: 28px;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--card-bg) 25%, #2d3a4f 50%, var(--card-bg) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 6px;
+            height: 20px;
+            margin-bottom: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .error-banner {
+            display: none;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--red);
+            color: #fca5a5;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 16px;
+            max-width: 960px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .error-banner.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>💰 قیمت لحظه‌ای ارز</h1>
+    <p class="subtitle">به واحد تومان — به‌روزرسانی خودکار هر ۶۰ ثانیه</p>
+
+    <div class="status-bar">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">در حال دریافت قیمت‌ها...</span>
+    </div>
+
+    <div class="error-banner" id="errorBanner">
+        ⚠️ دریافت اطلاعات با خطا مواجه شد. تلاش مجدد در ۳۰ ثانیه آینده...
+    </div>
+
+    <div class="grid" id="cardsGrid">
+        <!-- کارت‌ها به صورت داینامیک ساخته می‌شوند -->
+    </div>
+
+    <div class="footer">
+        منبع داده‌ها: <a href="https://nerkh.jahankhahan.shop" target="_blank" rel="noopener">Nerkhsanj</a> —
+        قیمت‌ها به صورت تقریبی و بر اساس بازار آزاد است. این اطلاعات توصیه مالی نیست.
+        <br>
+        آخرین به‌روزرسانی: <span id="lastUpdated">—</span>
+    </div>
+
+    <script>
+        // ============================================================
+        // تنظیمات
+        // ============================================================
+        const API_URL = 'https://nerkh.jahankhahan.shop/data/live.json';
+        const REFRESH_MS = 60_000;      // هر ۶۰ ثانیه
+        const RETRY_MS   = 30_000;      // در صورت خطا، ۳۰ ثانیه بعد دوباره تلاش کن
+
+        // ارزهایی که می‌خواهیم نمایش دهیم
+        const CURRENCIES = [
+            { key: 'dollar',  name: 'دلار آمریکا',       symbol: 'USD'  },
+            { key: 'tether',  name: 'تتر',                symbol: 'USDT' },
+            { key: 'euro',    name: 'یورو',               symbol: 'EUR'  },
+            { key: 'pound',   name: 'پوند انگلیس',        symbol: 'GBP'  },
+            { key: 'aed',     name: 'درهم امارات',        symbol: 'AED'  },
+            { key: 'try',     name: 'لیر ترکیه',          symbol: 'TRY'  },
+            { key: 'cny',     name: 'یوان چین',           symbol: 'CNY'  },
+        ];
+
+        // ============================================================
+        // عناصر DOM
+        // ============================================================
+        const grid         = document.getElementById('cardsGrid');
+        const statusDot    = document.getElementById('statusDot');
+        const statusText   = document.getElementById('statusText');
+        const lastUpdated  = document.getElementById('lastUpdated');
+        const errorBanner  = document.getElementById('errorBanner');
+
+        // ============================================================
+        // ابزارهای کمکی
+        // ============================================================
+
+        /** فرمت عدد با جداکننده هزارگان */
+        function formatPrice(value) {
+            if (value == null || isNaN(value)) return '—';
+            return Number(value).toLocaleString('en-US');
+        }
+
+        /** ساخت کارت خالی (اسکلتون) برای نمایش اولیه */
+        function buildSkeletonCards() {
+            grid.innerHTML = CURRENCIES.map(c => `
+                <div class="card" data-key="${c.key}">
+                    <div class="card-header">
+                        <div class="skeleton" style="width: 70px;"></div>
+                        <div class="skeleton" style="width: 35px;"></div>
+                    </div>
+                    <div class="skeleton" style="width: 110px; height: 28px; margin-bottom: 6px;"></div>
+                    <div class="skeleton" style="width: 60px; height: 14px;"></div>
+                </div>
+            `).join('');
+        }
+
+        /** به‌روزرسانی DOM با داده‌های جدید */
+        function renderRates(data) {
+            const rates  = data.rates || {};
+            const change = data.change || {};
+
+            CURRENCIES.forEach(c => {
+                const card = grid.querySelector(`.card[data-key="${c.key}"]`);
+                if (!card) return;
+
+                const price = rates[c.key];
+                const pct   = change[c.key];
+
+                // تعیین کلاس تغییر
+                let changeClass = 'neutral';
+                let changeText  = '—';
+                if (pct != null && !isNaN(pct)) {
+                    if (pct > 0) {
+                        changeClass = 'up';
+                        changeText  = `▲ ${pct.toFixed(2)}٪`;
+                    } else if (pct < 0) {
+                        changeClass = 'down';
+                        changeText  = `▼ ${Math.abs(pct).toFixed(2)}٪`;
+                    } else {
+                        changeText = '۰.۰۰٪';
+                    }
+                }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="currency-name">${c.name}</span>
+                        <span class="currency-symbol">${c.symbol}</span>
+                    </div>
+                    <div class="price">
+                        ${formatPrice(price)}
+                        <span class="price-unit">تومان</span>
+                    </div>
+                    <div class="change ${changeClass}">${changeText}</div>
+                `;
+            });
+
+            // نمایش زمان به‌روزرسانی
+            if (data.time) {
+                lastUpdated.textContent = `ساعت ${data.time} — تاریخ ${data.date || ''}`;
+            } else {
+                lastUpdated.textContent = new Date().toLocaleTimeString('fa-IR');
+            }
+        }
+
+        /** تنظیم وضعیت "دریافت" */
+        function setLoading() {
+            statusDot.classList.remove('error');
+            statusText.textContent = 'در حال دریافت قیمت‌ها...';
+            errorBanner.classList.remove('visible');
+        }
+
+        /** تنظیم وضعیت "موفق" */
+        function setSuccess() {
+            statusDot.classList.remove('error');
+            statusText.textContent = 'قیمت‌ها به‌روز است';
+            errorBanner.classList.remove('visible');
+        }
+
+        /** تنظیم وضعیت "خطا" */
+        function setError(message) {
+            statusDot.classList.add('error');
+            statusText.textContent = 'خطا در دریافت اطلاعات';
+            errorBanner.classList.add('visible');
+            if (message) console.error('[Rates]', message);
+        }
+
+        // ============================================================
+        // دریافت داده از API
+        // ============================================================
+
+        async function fetchRates() {
+            setLoading();
+
+            try {
+                const res = await fetch(API_URL, { cache: 'no-store' });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+
+                // اگر داده معتبر نبود، خطا بده
+                if (!data || !data.rates) {
+                    throw new Error('ساختار داده نامعتبر است');
+                }
+
+                renderRates(data);
+                setSuccess();
+
+            } catch (err) {
+                console.error('[Rates] خطا:', err);
+                setError(err.message);
+                // اگر قبلاً داده‌ای نمایش داده شده، آن را نگه دار
+                // اگر هیچ داده‌ای نداریم، اسکلتون را حفظ کن
+            }
+        }
+
+        // ============================================================
+        // حلقه به‌روزرسانی
+        // ============================================================
+
+        async function updateLoop() {
+            await fetchRates();
+
+            // اگر خطا داشتیم، سریع‌تر دوباره تلاش کن
+            const delay = errorBanner.classList.contains('visible')
+                ? RETRY_MS
+                : REFRESH_MS;
+
+            setTimeout(updateLoop, delay);
+        }
+
+        // ============================================================
+        // شروع
+        // ============================================================
+
+        buildSkeletonCards();
+        updateLoop();
+    </script>
+</body>
+</html>
