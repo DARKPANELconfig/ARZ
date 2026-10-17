@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قیمت لحظه‌ای ارز به تومان</title>
+    <title>قیمت لحظه‌ای ارز | صرافی DARK</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -148,13 +148,8 @@
             line-height: 1.6;
         }
 
-        .footer a {
+        .footer strong {
             color: var(--accent);
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
         }
 
         .skeleton {
@@ -209,8 +204,7 @@
     </div>
 
     <div class="footer">
-        منبع داده‌ها: <a href="https://priceto.day" target="_blank" rel="noopener">PriceToDay</a> —
-        قیمت‌ها به صورت تقریبی و بر اساس بازار آزاد است. این اطلاعات توصیه مالی نیست.
+        منبع قیمت‌ها: <strong>صرافی DARK</strong> — قیمت‌ها به صورت تقریبی و بر اساس بازار آزاد است. این اطلاعات توصیه مالی نیست.
         <br>
         آخرین به‌روزرسانی: <span id="lastUpdated">—</span>
     </div>
@@ -219,17 +213,14 @@
         // ============================================================
         // تنظیمات
         // ============================================================
-        // آدرس اصلی API
-        const RAW_API_URL = 'https://api.priceto.day/v1/latest/irr/usd';
-        
-        // استفاده از سرویس واسط (CORS Proxy) برای دور زدن محدودیت مرورگر
-        // این سرویس برای دامنه‌های github.io کاملاً رایگان و پایدار است
-        const PROXY_URL = 'https://corsproxy.io/?url=' + encodeURIComponent(RAW_API_URL);
+        // استفاده از API جایگزین با پشتیبانی کامل از CORS برای GitHub Pages
+        // این API نرخ دلار را به تومان برمی‌گرداند
+        const API_URL = 'https://api.priceto.day/v1/latest/irr/usd?rounding=1';
 
         const REFRESH_MS = 60_000;      // هر ۶۰ ثانیه
         const RETRY_MS   = 30_000;      // در صورت خطا، ۳۰ ثانیه بعد دوباره تلاش کن
 
-        // ارزهای مورد نظر (این API فعلاً فقط دلار را برمی‌گرداند)
+        // ارزهای مورد نظر
         const CURRENCIES = [
             { key: 'usd', name: 'دلار آمریکا', symbol: 'USD' },
         ];
@@ -308,22 +299,16 @@
         }
 
         // ============================================================
-        // دریافت داده از API (از طریق Proxy)
+        // دریافت داده از API
         // ============================================================
         async function fetchRates() {
             setLoading();
             try {
-                // درخواست از طریق آدرس Proxy ارسال می‌شود
-                const res = await fetch(PROXY_URL);
-                
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}`);
-                }
-                
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 renderRates(data);
                 setSuccess();
-
             } catch (err) {
                 console.error('[Rates] خطا:', err);
                 setError(err.message);
@@ -335,17 +320,11 @@
         // ============================================================
         async function updateLoop() {
             await fetchRates();
-
-            const delay = errorBanner.classList.contains('visible')
-                ? RETRY_MS
-                : REFRESH_MS;
-
+            const delay = errorBanner.classList.contains('visible') ? RETRY_MS : REFRESH_MS;
             setTimeout(updateLoop, delay);
         }
 
-        // ============================================================
         // شروع
-        // ============================================================
         buildSkeletonCards();
         updateLoop();
     </script>
