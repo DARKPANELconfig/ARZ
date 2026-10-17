@@ -50,7 +50,7 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.2rem;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
         }
         .card {
             background: var(--card-bg);
@@ -81,21 +81,21 @@
             font-size: 0.9rem;
             margin-right: 0.4rem;
         }
-        .price {
-            font-size: 1.9rem;
+        .price-usd {
+            font-size: 1.6rem;
             font-weight: 800;
             direction: ltr;
             text-align: right;
             color: #fff;
         }
         .change {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             padding: 0.2rem 0.6rem;
             border-radius: 8px;
             direction: ltr;
             display: inline-block;
-            margin-top: 0.5rem;
+            margin-top: 0.3rem;
         }
         .change.up {
             color: var(--green);
@@ -104,6 +104,16 @@
         .change.down {
             color: var(--red);
             background: rgba(246, 70, 93, 0.1);
+        }
+        .price-toman {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent);
+            direction: rtl;
+            text-align: right;
+            margin-top: 0.8rem;
+            padding-top: 0.6rem;
+            border-top: 1px dashed var(--border);
         }
         .status-bar {
             margin-top: 2rem;
@@ -149,7 +159,8 @@
         }
         @media (max-width: 600px) {
             header h1 { font-size: 2rem; }
-            .price { font-size: 1.5rem; }
+            .price-usd { font-size: 1.3rem; }
+            .price-toman { font-size: 1rem; }
             .grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -158,7 +169,7 @@
 
     <header>
         <h1>صرافی DARK</h1>
-        <p>قیمت لحظه‌ای بازارهای ارز دیجیتال</p>
+        <p>قیمت لحظه‌ای بازارهای ارز دیجیتال (دلار و تومان)</p>
     </header>
 
     <main class="grid" id="priceGrid">
@@ -174,39 +185,45 @@
     </div>
 
     <footer>
-        صرافی DARK © ۲۰۲۶ | داده‌ها از CoinGecko
+        صرافی DARK © ۲۰۲۶ | داده‌ها از CoinGecko و Nobitex
     </footer>
 
     <script>
         // ============================================================
-        // تنظیمات ارزها (برای اضافه کردن ارز جدید، فقط اینجا را ویرایش کنید)
+        // لیست کامل ۱۵ ارز (شناسه CoinGecko + نماد نوبیتکس)
+        // برای اضافه کردن ارز جدید، فقط یک شیء جدید به این آرایه اضافه کنید.
         // ============================================================
         const COINS = [
-            { id: 'tether', name: 'تتر', symbol: 'USDT' },
-            { id: 'the-open-network', name: 'تون', symbol: 'TON' },
-            { id: 'tron', name: 'ترون', symbol: 'TRX' },
-            { id: 'bitcoin', name: 'بیت کوین', symbol: 'BTC' },
-            { id: 'ethereum', name: 'اتریوم', symbol: 'ETH' },
-            { id: 'usd-coin', name: 'دلار', symbol: 'USDC' } // USDC به عنوان نماینده دلار دیجیتال
+            // --- ۵ ارز اولیه ---
+            { id: 'tether',            name: 'تتر',          symbol: 'USDT', nobitex: 'usdt' },
+            { id: 'the-open-network',  name: 'تون',          symbol: 'TON',  nobitex: 'ton'  },
+            { id: 'tron',              name: 'ترون',         symbol: 'TRX',  nobitex: 'trx'  },
+            { id: 'bitcoin',           name: 'بیت کوین',     symbol: 'BTC',  nobitex: 'btc'  },
+            { id: 'ethereum',          name: 'اتریوم',       symbol: 'ETH',  nobitex: 'eth'  },
+            // --- ۱۰ ارز جدید پرطرفدار ---
+            { id: 'solana',            name: 'سولانا',       symbol: 'SOL',  nobitex: 'sol'  },
+            { id: 'ripple',            name: 'ریپل',         symbol: 'XRP',  nobitex: 'xrp'  },
+            { id: 'dogecoin',          name: 'دوج کوین',     symbol: 'DOGE', nobitex: 'doge' },
+            { id: 'cardano',           name: 'کاردانو',      symbol: 'ADA',  nobitex: 'ada'  },
+            { id: 'binancecoin',       name: 'بایننس کوین',  symbol: 'BNB',  nobitex: 'bnb'  },
+            { id: 'avalanche-2',       name: 'آوالانچ',      symbol: 'AVAX', nobitex: 'avax' },
+            { id: 'chainlink',         name: 'چین لینک',     symbol: 'LINK', nobitex: 'link' },
+            { id: 'polkadot',          name: 'پولکادات',     symbol: 'DOT',  nobitex: 'dot'  },
+            { id: 'shiba-inu',         name: 'شیبا اینو',    symbol: 'SHIB', nobitex: 'shib' },
+            { id: 'litecoin',          name: 'لایت کوین',    symbol: 'LTC',  nobitex: 'ltc'  },
         ];
 
-        // ============================================================
-        // API تنظیمات
-        // ============================================================
-        const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
-        const REFRESH_INTERVAL = 60000; // هر ۶۰ ثانیه
+        const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price';
+        const NOBITEX_URL = 'https://apiv2.nobitex.ir/market/stats';
+        const REFRESH_INTERVAL = 60000; // ۶۰ ثانیه
 
         // ============================================================
         // توابع کمکی
         // ============================================================
-        function formatPrice(price) {
-            if (price >= 1000) {
-                return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            } else if (price >= 1) {
-                return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
-            } else {
-                return price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
-            }
+        function formatUSD(price) {
+            if (price >= 1000) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (price >= 1) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+            return price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
         }
 
         function formatChange(change) {
@@ -225,7 +242,7 @@
         // ============================================================
         function buildCards() {
             const grid = document.getElementById('priceGrid');
-            grid.innerHTML = ''; // پاک کردن
+            grid.innerHTML = '';
 
             COINS.forEach(coin => {
                 const card = document.createElement('div');
@@ -238,51 +255,87 @@
                             <span class="coin-symbol">${coin.symbol}</span>
                         </div>
                     </div>
-                    <div class="price" id="price-${coin.id}">—</div>
-                    <div class="change" id="change-${coin.id}">—</div>
+                    <div class="price-usd" id="price-usd-${coin.id}">—</div>
+                    <div class="change" id="change-usd-${coin.id}">—</div>
+                    <div class="price-toman" id="price-toman-${coin.id}">— تومان</div>
                 `;
                 grid.appendChild(card);
             });
         }
 
         // ============================================================
-        // دریافت قیمت‌ها از API
+        // دریافت قیمت دلاری از CoinGecko
         // ============================================================
-        async function fetchAllPrices() {
+        async function fetchUSDTPrices() {
             try {
                 const ids = COINS.map(c => c.id).join(',');
-                const response = await fetch(
-                    `${API_URL}?ids=${ids}&vs_currencies=usd&include_24hr_change=true`
+                const res = await fetch(
+                    `${COINGECKO_URL}?ids=${ids}&vs_currencies=usd&include_24hr_change=true`
                 );
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
+                if (!res.ok) throw new Error('CoinGecko response error');
+                const data = await res.json();
 
-                // به‌روزرسانی DOM
                 COINS.forEach(coin => {
-                    const priceEl = document.getElementById(`price-${coin.id}`);
-                    const changeEl = document.getElementById(`change-${coin.id}`);
-                    const coinData = data[coin.id];
+                    const priceEl = document.getElementById(`price-usd-${coin.id}`);
+                    const changeEl = document.getElementById(`change-usd-${coin.id}`);
+                    const d = data[coin.id];
 
-                    if (coinData && coinData.usd !== undefined) {
-                        priceEl.textContent = '$' + formatPrice(coinData.usd);
-                        const change = coinData.usd_24h_change;
-                        changeEl.textContent = formatChange(change);
-                        changeEl.className = 'change ' + getChangeClass(change);
+                    if (d && d.usd !== undefined) {
+                        priceEl.textContent = '$' + formatUSD(d.usd);
+                        const ch = d.usd_24h_change;
+                        changeEl.textContent = formatChange(ch);
+                        changeEl.className = 'change ' + getChangeClass(ch);
                     } else {
                         priceEl.textContent = 'N/A';
                         changeEl.textContent = '—';
                         changeEl.className = 'change';
                     }
                 });
-
-                // به‌روزرسانی وضعیت
-                const now = new Date().toLocaleTimeString('fa-IR');
-                document.getElementById('lastUpdate').textContent = `آخرین بروزرسانی: ${now}`;
-
-            } catch (error) {
-                console.error('Error fetching prices:', error);
-                document.getElementById('lastUpdate').textContent = 'خطا در دریافت داده — دوباره تلاش کنید';
+            } catch (e) {
+                console.error('خطا در دریافت قیمت دلاری:', e);
             }
+        }
+
+        // ============================================================
+        // دریافت قیمت تومانی از نوبیتکس (تبدیل ریال به تومان)
+        // ============================================================
+        async function fetchTomanPrices() {
+            try {
+                const srcList = COINS.map(c => c.nobitex).join(',');
+                const res = await fetch(`${NOBITEX_URL}?srcCurrency=${srcList}&dstCurrency=rls`);
+                if (!res.ok) throw new Error('Nobitex response error');
+                const data = await res.json();
+
+                if (data.status !== 'ok' || !data.stats) {
+                    console.warn('پاسخ نامعتبر از نوبیتکس:', data);
+                    return;
+                }
+
+                COINS.forEach(coin => {
+                    const el = document.getElementById(`price-toman-${coin.id}`);
+                    const marketKey = `${coin.nobitex.toUpperCase()}IRT`;
+                    const marketData = data.stats[marketKey];
+
+                    if (marketData && marketData.latest) {
+                        // نوبیتکس قیمت را به ریال می‌دهد؛ تقسیم بر ۱۰ برای تومان
+                        const toman = parseFloat(marketData.latest) / 10;
+                        el.textContent = toman.toLocaleString('fa-IR', { maximumFractionDigits: 0 }) + ' تومان';
+                    } else {
+                        el.textContent = '— تومان';
+                    }
+                });
+            } catch (e) {
+                console.error('خطا در دریافت قیمت تومانی:', e);
+            }
+        }
+
+        // ============================================================
+        // اجرای همزمان هر دو درخواست
+        // ============================================================
+        async function fetchAllPrices() {
+            await Promise.all([fetchUSDTPrices(), fetchTomanPrices()]);
+            const now = new Date().toLocaleTimeString('fa-IR');
+            document.getElementById('lastUpdate').textContent = `آخرین بروزرسانی: ${now}`;
         }
 
         // ============================================================
@@ -290,8 +343,6 @@
         // ============================================================
         buildCards();
         fetchAllPrices();
-
-        // بروزرسانی خودکار
         setInterval(fetchAllPrices, REFRESH_INTERVAL);
     </script>
 
